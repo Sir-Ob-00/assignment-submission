@@ -3,16 +3,25 @@ import {
     getAssignmentsForStudent,
     getAllAssignments,
     submitAssignment,
+    removeAssignment,
 } from "../services/assignment.service.js";
 import { logError } from "../utils/logger.js";
 
 /**
  * Create a new assignment (Lecturer/Admin)
  * POST /api/assignments
+ * Content-Type: multipart/form-data  (file field: "attachment")
  */
 export const createNewAssignment = async (req, res, next) => {
     try {
-        const data = req.body; // { title, description, dueDate }
+        const { title, description, dueDate } = req.body;
+
+        const data = {
+            title,
+            description,
+            dueDate,
+            fileUrl: req.file ? `/uploads/${req.file.filename}` : null,
+        };
 
         const assignment = await createAssignment(data);
 
@@ -65,27 +74,25 @@ export const getStudentAssignments = async (req, res, next) => {
 };
 
 /**
- * Submit assignment (Student) - handles PDF upload via Multer
+ * Submit assignment (Student) — PDF upload via Multer
  * POST /api/assignments/submit/:id
  */
 export const submitStudentAssignment = async (req, res, next) => {
     try {
         const assignmentId = req.params.id;
-        const studentId = req.user._id;
+        const studentId    = req.user._id;
 
-        // Check if file is uploaded
         if (!req.file) {
             return res.status(400).json({
                 success: false,
                 message: "No file uploaded. Please attach a PDF file.",
-        });
+            });
         }
 
-        // Prepare submission data for service
         const submissionData = {
-            fileUrl: `/uploads/${req.file.filename}`, // use static path
+            fileUrl:     `/uploads/${req.file.filename}`,
             submittedAt: new Date(),
-            status: "submitted",
+            status:      "submitted",
         };
 
         const assignment = await submitAssignment(assignmentId, studentId, submissionData);
@@ -99,4 +106,29 @@ export const submitStudentAssignment = async (req, res, next) => {
         logError(`Submit Assignment Error: ${error.message}`);
         next(error);
     }
-    };
+};
+
+/**
+ * Delete an assignment (Lecturer/Admin)
+ * DELETE /api/assignments/:id
+ */
+export const deleteAssignment = async (req, res, next) => {
+    try {
+        const deleted = await removeAssignment(req.params.id);
+
+        if (!deleted) {
+            return res.status(404).json({
+                success: false,
+                message: "Assignment not found",
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Assignment deleted successfully",
+        });
+    } catch (error) {
+        logError(`Delete Assignment Error: ${error.message}`);
+        next(error);
+    }
+};
