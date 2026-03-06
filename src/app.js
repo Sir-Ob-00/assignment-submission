@@ -5,7 +5,7 @@ import morgan from "morgan";
 import path from "path";
 import { fileURLToPath } from "url";
 
-import {limiter} from "./middleware/ratelimit.middleware.js";
+import {limiter} from "./middleware/rateLimit.middleware.js";
 import {errorHandler} from "./middleware/error.middleware.js";
 import {logger} from "./middleware/logger.middleware.js";
 
