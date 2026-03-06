@@ -4,16 +4,17 @@ import Assignment from "../models/assignment.model.js";
  * Create a new assignment (lecturer/admin)
  * Reuses existing fileUrl field for optional lecturer attachment
  */
+// service
 export const createAssignment = async (data) => {
-    const assignment = await Assignment.create({
-        title:       data.title,
-        description: data.description,
-        dueDate:     data.dueDate,
-        fileUrl:     data.fileUrl || null,   // lecturer's attachment (overwritten on student submit)
-        status:      "pending",
-    });
-    return assignment;
+  return Assignment.create({
+    title: data.title,
+    description: data.description,
+    dueDate: data.dueDate,
+    attachmentUrl: data.attachmentUrl || null, // lecturer file
+    status: "pending",
+  });
 };
+
 
 /**
  * Get all assignments — annotated with submitted flag for a given student

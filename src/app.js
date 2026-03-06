@@ -48,7 +48,8 @@ app.use(morgan("dev"));
 app.use(logger);
 
 // Static folder for uploaded files
-app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+
 
 
 //    ROUTES

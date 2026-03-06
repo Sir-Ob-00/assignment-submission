@@ -1,18 +1,19 @@
+import fs from "node:fs";
+import path from "node:path";
 import multer from "multer";
-import path from "path";
 
-// Storage configuration
+const UPLOAD_DIR = path.join(process.cwd(), "uploads");
+if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, "uploads/"); // all files go to /uploads folder
-    },
-    filename: (req, file, cb) => {
-        // generate unique filename: timestamp-random.extension
-        const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-        const ext = path.extname(file.originalname); // preserve file extension
-        cb(null, uniqueSuffix + ext);
-    },
+  destination: (_req, _file, cb) => cb(null, UPLOAD_DIR),
+  filename: (_req, file, cb) => {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    const ext = path.extname(file.originalname);
+    cb(null, uniqueSuffix + ext);
+  },
 });
+
 
 
 // File filter

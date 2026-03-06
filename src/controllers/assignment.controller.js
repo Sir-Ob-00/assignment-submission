@@ -12,29 +12,31 @@ import { logError } from "../utils/logger.js";
  * POST /api/assignments
  * Content-Type: multipart/form-data  (file field: "attachment")
  */
+// controller: create assignment
 export const createNewAssignment = async (req, res, next) => {
-    try {
-        const { title, description, dueDate } = req.body;
+  try {
+    const { title, description, dueDate } = req.body;
 
-        const data = {
-            title,
-            description,
-            dueDate,
-            fileUrl: req.file ? `/uploads/${req.file.filename}` : null,
-        };
+    const data = {
+      title,
+      description,
+      dueDate,
+      attachmentUrl: req.file ? `/uploads/${req.file.filename}` : null, // use attachmentUrl
+    };
 
-        const assignment = await createAssignment(data);
+    const assignment = await createAssignment(data);
 
-        res.status(201).json({
-            success: true,
-            message: "Assignment created successfully",
-            data: assignment,
-        });
-    } catch (error) {
-        logError(`Create Assignment Error: ${error.message}`);
-        next(error);
-    }
+    res.status(201).json({
+      success: true,
+      message: "Assignment created successfully",
+      data: assignment,
+    });
+  } catch (error) {
+    logError(`Create Assignment Error: ${error.message}`);
+    next(error);
+  }
 };
+
 
 /**
  * Get all assignments (Lecturer/Admin)
